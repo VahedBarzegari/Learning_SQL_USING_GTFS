@@ -445,6 +445,18 @@ code {
   opacity: 0.55;
 }
 
+.starter-list button.starter-active {
+  border-color: var(--accent);
+  background: var(--surface);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.starter-list button.starter-active:hover:not(:disabled) {
+  border-color: var(--accent-hover);
+  background: var(--surface-nested);
+}
+
 .editor-bar {
   display: flex;
   gap: 0.85rem;

@@ -3,8 +3,11 @@
  * All imported columns use TEXT affinity so learners can practise CAST(...) when needed.
  */
 (function (global) {
-  /** Files larger than this are unchecked by default in the UI */
-  var LARGE_BYTES = 15 * 1024 * 1024;
+  /**
+   * Uncompressed-ish size above this skips content sniff (avoids loading huge extracts into RAM).
+   * Those entries stay checked — user prefers large tables imported by default.
+   */
+  var SNIFF_MAX_UNCOMPRESSED_BYTES = 14 * 1024 * 1024;
 
   var INSERT_CHUNK = 2000;
 
@@ -31,7 +34,7 @@
   /**
    * JSZip exposes per-file payload on `_data`; `entry.uncompressedSize` is often undefined.
    * @param {*} entry file from zipRoot.forEach
-   * @returns {{ bytes:number, sizeKind:string, defaultChecked:boolean }}
+   * @returns {{ bytes:number, sizeKind:string }}
    */
   function zipTxtEntrySizing(entry) {
     var d = entry && entry._data;
@@ -70,11 +73,87 @@
       bytes = 0;
     }
 
-    /** when only deflated ZIP payload bytes are known, be conservative enabling by default */
-    var SAFE_PAYLOAD = 3 * 1024 * 1024;
-    var defaultChecked = sizeKind === "csv" ? bytes <= LARGE_BYTES : bytes <= SAFE_PAYLOAD;
+    return { bytes: bytes, sizeKind: sizeKind };
+  }
 
-    return { bytes: bytes, sizeKind: sizeKind, defaultChecked: defaultChecked };
+  /** True when CSV appears to contain at least one non-empty body cell (handles header-only). */
+  function csvHasAtLeastOneDataRow(csvText, Papa) {
+    var s = String(csvText || "");
+    if (!s.trim()) return false;
+    var parsed = Papa.parse(s, {
+      header: true,
+      skipEmptyLines: "greedy",
+      dynamicTyping: false,
+      preview: 8000,
+    });
+    var fields = parsed.meta && parsed.meta.fields ? parsed.meta.fields : null;
+    var rows = parsed.data;
+    if (!rows || rows.length === 0) return false;
+
+    var r,
+      row,
+      f,
+      keys,
+      k,
+      key,
+      v;
+    for (r = 0; r < rows.length; r++) {
+      row = rows[r];
+      if (!row || typeof row !== "object") continue;
+      if (fields && fields.length) {
+        for (f = 0; f < fields.length; f++) {
+          key = fields[f];
+          if (key == null || String(key).trim() === "") continue;
+          v = row[key];
+          if (v !== undefined && v !== null && String(v).trim() !== "") return true;
+        }
+      } else {
+        keys = Object.keys(row);
+        for (k = 0; k < keys.length; k++) {
+          v = row[keys[k]];
+          if (v !== undefined && v !== null && String(v).trim() !== "") return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checked by default everywhere; unchecked only after sniff finds header-only (no body rows).
+   * Skips full sniff when ZIP metadata suggests an extract larger than {@link SNIFF_MAX_UNCOMPRESSED_BYTES}.
+   * @param {JSZip} zipRoot
+   * @param {{zipPath:string,defaultChecked?:boolean,bytes:number}[]} entries
+   */
+  async function refineImportCheckboxDefaults(zipRoot, entries) {
+    var Papa = global.Papa;
+    if (!Papa || !entries || !entries.length) return entries;
+
+    var i,
+      info,
+      b,
+      ze,
+      text;
+    for (i = 0; i < entries.length; i++) {
+      info = entries[i];
+      info.defaultChecked = true;
+
+      b = typeof info.bytes === "number" && info.bytes >= 0 ? info.bytes : 0;
+      if (b > SNIFF_MAX_UNCOMPRESSED_BYTES || b === 0) continue;
+
+      ze = zipRoot.file(info.zipPath);
+      if (!ze) {
+        info.defaultChecked = false;
+        continue;
+      }
+
+      try {
+        text = await ze.async("text");
+        info.defaultChecked = csvHasAtLeastOneDataRow(text, Papa);
+      } catch (_e) {
+        info.defaultChecked = true;
+      }
+    }
+    return entries;
   }
 
   /**
@@ -100,7 +179,7 @@
         suggestedTable: tableNameFromTxtFilename(name),
         bytes: sizing.bytes,
         sizeKind: sizing.sizeKind,
-        defaultChecked: sizing.defaultChecked,
+        defaultChecked: true,
       });
     });
 
@@ -294,8 +373,9 @@
   }
 
   global.GTFS_IMP = {
-    LARGE_BYTE_THRESHOLD: LARGE_BYTES,
+    SNIFF_MAX_UNCOMPRESSED_BYTES: SNIFF_MAX_UNCOMPRESSED_BYTES,
     describeTxtFiles: describeTxtFiles,
+    refineImportCheckboxDefaults: refineImportCheckboxDefaults,
     buildDatabase: buildDatabase,
     formatBytes: formatBytes,
   };

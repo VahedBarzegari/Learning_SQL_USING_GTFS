@@ -142,6 +142,22 @@
     return window.GTFS_IMP ? window.GTFS_IMP.formatBytes(bytes) : bytes + " B";
   }
 
+  function clearStarterSelection() {
+    Array.prototype.slice.call(els.starterList.querySelectorAll("button.starter-active")).forEach(function (b) {
+      b.classList.remove("starter-active");
+      b.removeAttribute("aria-current");
+    });
+  }
+
+  /** @param {HTMLButtonElement|null} btn */
+  function markStarterSelected(btn) {
+    clearStarterSelection();
+    if (btn && !btn.disabled) {
+      btn.classList.add("starter-active");
+      btn.setAttribute("aria-current", "true");
+    }
+  }
+
   function appendStarterButton(ulEl, preset) {
     var li = document.createElement("li");
     var btn = document.createElement("button");
@@ -150,6 +166,7 @@
     btn.dataset.needs = JSON.stringify(preset.tables || []);
     btn.disabled = false;
     btn.addEventListener("click", function () {
+      markStarterSelected(btn);
       if (sqlCm) {
         sqlCm.setValue(preset.sql);
         sqlCm.focus();
@@ -234,8 +251,12 @@
         (tableSet !== null && needs.every(function (t) { return tableSet[String(t)] }));
 
       btn.disabled = !ok;
+      if (!ok) {
+        btn.classList.remove("starter-active");
+        btn.removeAttribute("aria-current");
+      }
 
-      btn.title = ok ? "Paste into editor" : 'Import tables: "' + needs.join('", "') + '" first';
+      btn.title = ok ? "Load into editor" : 'Import tables: "' + needs.join('", "') + '" first';
     });
   }
 
@@ -424,6 +445,10 @@
       if (!zipTxtEntries.length)
         throw new Error("No .txt CSV tables found inside the archive.");
 
+      status("Checking CSV tables (header-only files stay unchecked)…");
+      if (typeof GT.refineImportCheckboxDefaults === "function")
+        await GT.refineImportCheckboxDefaults(zipRoot, zipTxtEntries);
+
       if (els.importCollapse) {
         els.importCollapse.classList.remove("hidden");
         els.importCollapse.open = true;
@@ -468,7 +493,7 @@
       els.btnBuild.disabled = false;
       els.btnClear.disabled = false;
       refreshStarterAvailability();
-      status(zipTxtEntries.length + " CSV tables detected — choose files, then Build.");
+      status(zipTxtEntries.length + " CSV tables detected — unchecked items are header-only (no data rows), then Build.");
     } catch (e) {
       showError(e && e.message ? e.message : String(e));
       els.btnBuild.disabled = true;
