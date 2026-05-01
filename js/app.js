@@ -516,7 +516,7 @@
         true,
         "Parsing " +
           selected.length +
-          " CSV table(s) into SQLite — keep this tab visible…",
+          " CSV table(s) into SQLite…",
       );
       var result = await window.GTFS_IMP.buildDatabase(SQL, zipRoot, selected);
 
@@ -570,7 +570,7 @@
       }
 
       if (result.warnings.length > 12) {
-        console.warn("[GTFS SQL Lab] extra warnings suppressed", result.warnings);
+        console.warn("[Transit SQL Workbench] extra warnings suppressed", result.warnings);
       }
     } catch (e) {
       showError(e && e.message ? e.message : String(e));

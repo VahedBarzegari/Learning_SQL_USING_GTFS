@@ -7,8 +7,8 @@
 :root {
   /* Layout regions */
   --canvas: #e4e6eb;
-  --header-bg: #d8dce3;
-  --header-border: #c5cad3;
+  --header-bg: #0f2744;
+  --header-border: #0a1c32;
   --sidebar-bg: #e8eaef;
   --sidebar-edge: #c9ced7;
   --workspace-bg: #eceef3;
@@ -78,7 +78,9 @@ code {
   padding: 0.85rem 1.25rem;
   border-bottom: 1px solid var(--header-border);
   background: var(--header-bg);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 4px 14px rgba(15, 39, 68, 0.22);
 }
 
 .brand {
@@ -87,16 +89,33 @@ code {
   gap: 0.2rem;
 }
 
-.logo {
+.top .logo {
   font-weight: 700;
-  font-size: 1.12rem;
+  font-size: 1.15rem;
   letter-spacing: -0.02em;
-  color: var(--text);
+  color: #f2f5fa;
 }
 
-.tagline {
-  color: var(--muted);
-  font-size: 0.82rem;
+/* Warm ivory/amber CTAs read clearly against the cool navy header */
+.top .btn-header-import {
+  background: #fdf6ea;
+  border-color: #c9953e;
+  color: #2a1f0a;
+  box-shadow:
+    0 1px 2px rgba(42, 31, 10, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.55) inset;
+}
+
+.top .btn-header-import:hover:not(:disabled) {
+  background: #fff4dd;
+  border-color: #b07d28;
+  color: #1a1407;
+}
+
+.top .btn-header-import code {
+  background: rgba(201, 149, 62, 0.18);
+  border-color: rgba(176, 125, 40, 0.35);
+  color: #2a1f0a;
 }
 
 .side {

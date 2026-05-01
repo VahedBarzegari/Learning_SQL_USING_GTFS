@@ -9,7 +9,11 @@
     /* CodeMirror sqlite extension keywords */
     "abort action add after all analyze attach autoincrement before begin cascade case cast check collate column commit conflict constraint cross current_date current_time current_timestamp database default deferrable deferred detach each else end escape exclusive exists explain fail for foreign full glob if ignore immediate index indexed initially inner instead intersect isnull key left limit match natural no notnull null of offset outer plan pragma primary query raise recursive references regexp reindex release rename replace restrict right rollback row savepoint temp temporary then to transaction trigger unique using vacuum view virtual when with without " +
     /* common literals / extras */
-    "true false ";
+    "true false " +
+    /* aggregates & common funcs (match js/sqlite-codemirror-augment.js for editor styling) */
+    "min max avg sum total group_concat row_number rank dense_rank ntile lag lead first_value last_value " +
+    "abs coalesce hex ifnull iif instr length printf quote random round rtrim ltrim trim substr typeof unicode " +
+    "strftime date time datetime julianday cast ";
 
   var KW = null;
 

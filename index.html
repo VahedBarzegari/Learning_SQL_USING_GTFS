@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SQL × GTFS Lab</title>
+    <title>Transit SQL Workbench</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link
       rel="stylesheet"
@@ -17,10 +17,9 @@
     <div class="app">
       <header class="top">
         <div class="brand">
-          <span class="logo">SQL × GTFS</span>
-          <span class="tagline">Learn SQL on real transit feeds in your browser</span>
+          <span class="logo">Transit SQL Workbench</span>
         </div>
-        <label class="file-pick btn primary">
+        <label class="file-pick btn primary btn-header-import">
           <input type="file" id="zipInput" accept=".zip,application/zip" hidden />
           Choose GTFS <code>.zip</code>
         </label>
@@ -83,6 +82,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.17/lib/codemirror.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.17/mode/sql/sql.min.js"></script>
+    <script src="js/sqlite-codemirror-augment.js"></script>
     <script src="js/presets.js"></script>
     <script src="js/gtfs-importer.js"></script>
     <script src="js/sql-keyword-case.js"></script>
