@@ -1,0 +1,30 @@
+'use strict';
+
+/** From GTFS_SQL_50_Hard_Exercises.docx (keyword spacing fixed; SELECT 1 placeholders omitted) */
+module.exports = [
+  ["Calculate headway (avg time diff between trips per route)", ["trips", "stop_times"], `SELECT route_id, AVG(diff) AS avg_headway FROM (  SELECT t.route_id,         (strftime('%s', st2.departure_time) - strftime('%s', st1.departure_time)) AS diff  FROM stop_times st1  JOIN stop_times st2     ON st1.trip_id != st2.trip_id  JOIN trips t ON st1.trip_id = t.trip_id  WHERE st1.stop_sequence = 1 AND st2.stop_sequence = 1) GROUP BY route_id;`],
+  ["Find longest trip duration", ["stop_times"], `SELECT trip_id, MAX(departure_time) - MIN(departure_time) AS duration FROM stop_times GROUP BY trip_id ORDER BY duration DESC LIMIT 5;`],
+  ["Detect inconsistent stop_sequence gaps", ["stop_times"], `SELECT trip_id FROM stop_times GROUP BY trip_id HAVING MAX(stop_sequence) != COUNT(*);`],
+  ["Find routes with most overlapping stops", ["trips", "stop_times"], `SELECT t1.route_id, t2.route_id, COUNT(*) AS common_stops FROM stop_times st1 JOIN stop_times st2 ON st1.stop_id = st2.stop_id JOIN trips t1 ON st1.trip_id = t1.trip_id JOIN trips t2 ON st2.trip_id = t2.trip_id WHERE t1.route_id != t2.route_id GROUP BY t1.route_id, t2.route_id ORDER BY common_stops DESC LIMIT 10;`],
+  ["Identify duplicate trip patterns", ["stop_times"], `SELECT GROUP_CONCAT(stop_id), COUNT(*) FROM stop_times GROUP BY trip_id HAVING COUNT(*) > 1;`],
+  ["Find routes with inconsistent directions", ["trips"], `SELECT route_id FROM trips GROUP BY route_id HAVING COUNT(DISTINCT direction_id) != 2;`],
+  ["Calculate average speed (distance/time if shape_dist_traveled exists)", ["stop_times"], `SELECT trip_id, MAX(shape_dist_traveled) /  (MAX(departure_time) - MIN(departure_time)) AS speed FROM stop_times GROUP BY trip_id;`],
+  ["Find busiest hour of system", ["stop_times"], `SELECT SUBSTR(departure_time,1,2) AS hour, COUNT(*) FROM stop_times GROUP BY hour ORDER BY COUNT(*) DESC LIMIT 1;`],
+  ["Find routes with highest stop density", ["trips", "stop_times"], `SELECT t.route_id, COUNT(*) / COUNT(DISTINCT st.trip_id) AS avg_stops FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY t.route_id ORDER BY avg_stops DESC;`],
+  ["Detect trips with loops (repeated stops)", ["stop_times"], `SELECT trip_id FROM stop_times GROUP BY trip_id, stop_id HAVING COUNT(*) > 1;`],
+  ["Rank routes by trip count", ["trips"], `SELECT route_id, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM trips GROUP BY route_id;`],
+  ["Find longest route (most unique stops)", ["trips", "stop_times"], `SELECT t.route_id, COUNT(DISTINCT st.stop_id) AS stops FROM trips t JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY t.route_id ORDER BY stops DESC LIMIT 1;`],
+  ["Detect missing departure times", ["stop_times"], `SELECT * FROM stop_times WHERE departure_time IS NULL;`],
+  ["Compute trip duration per route", ["trips", "stop_times"], `SELECT t.route_id, AVG(MAX(st.departure_time) - MIN(st.departure_time)) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY t.route_id;`],
+  ["Identify routes sharing identical stop sets", ["trips", "stop_times"], `SELECT route_id, GROUP_CONCAT(DISTINCT stop_id) FROM trips t JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY route_id;`],
+  ["Find stops with highest transfer potential", ["trips", "stop_times"], `SELECT stop_id, COUNT(DISTINCT route_id) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY stop_id ORDER BY COUNT(*) DESC LIMIT 10;`],
+  ["Trips with irregular time gaps", ["stop_times"], `SELECT trip_id FROM ( SELECT trip_id, (strftime('%s', departure_time) -   LAG(strftime('%s', departure_time)) OVER (PARTITION BY trip_id ORDER BY stop_sequence)) AS gap FROM stop_times) WHERE gap < 0;`],
+  ["Compute route coverage (bounding box)", ["stops"], `SELECT MIN(stop_lat), MAX(stop_lat), MIN(stop_lon), MAX(stop_lon) FROM stops;`],
+  ["Find most central stop (used in most routes)", ["trips", "stop_times"], `SELECT stop_id, COUNT(DISTINCT route_id) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY stop_id ORDER BY COUNT(*) DESC LIMIT 1;`],
+  ["Detect trips with missing stops", ["trips", "stop_times"], `SELECT trip_id FROM trips WHERE trip_id NOT IN (SELECT DISTINCT trip_id FROM stop_times);`],
+  ["Calculate average headway per hour", ["stop_times"], `SELECT SUBSTR(departure_time,1,2) AS hour, AVG(diff) FROM ( SELECT departure_time, (strftime('%s', departure_time) -  LAG(strftime('%s', departure_time)) OVER (ORDER BY departure_time)) AS diff FROM stop_times WHERE stop_sequence = 1) GROUP BY hour;`],
+  ["Find longest gap between trips per route", ["trips", "stop_times"], `SELECT route_id, MAX(diff) FROM ( SELECT t.route_id, (strftime('%s', st2.departure_time) -  strftime('%s', st1.departure_time)) AS diff FROM stop_times st1 JOIN stop_times st2 ON st1.trip_id != st2.trip_id JOIN trips t ON st1.trip_id = t.trip_id) GROUP BY route_id;`],
+  ["Identify routes with extreme travel times", ["trips", "stop_times"], `SELECT route_id, MAX(duration) - MIN(duration) FROM ( SELECT t.route_id, MAX(st.departure_time) - MIN(st.departure_time) AS duration FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY st.trip_id) GROUP BY route_id;`],
+  ["Stops farthest apart (rough)", ["stops"], `SELECT s1.stop_id, s2.stop_id, ((s1.stop_lat - s2.stop_lat)*(s1.stop_lat - s2.stop_lat) +  (s1.stop_lon - s2.stop_lon)*(s1.stop_lon - s2.stop_lon)) AS dist FROM stops s1, stops s2 ORDER BY dist DESC LIMIT 1;`],
+  ["Identify peak route usage per hour", ["trips", "stop_times"], `SELECT route_id, hour, COUNT(*) FROM ( SELECT t.route_id, SUBSTR(st.departure_time,1,2) AS hour FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id) GROUP BY route_id, hour ORDER BY COUNT(*) DESC;`],
+];

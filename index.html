@@ -30,7 +30,8 @@
         <section class="panel">
           <h2>Dataset</h2>
           <p id="datasetHint" class="muted">
-            Load a GTFS ZIP. Unchecked files stay out of SQLite until you build.
+            Load a GTFS ZIP. Unchecked files stay out of SQLite until you build. Rows with “(zip)” list stored/deflated
+            payload size inside the archive; bare numbers mean uncompressed CSV size from ZIP headers (helps spot huge tables).
           </p>
           <details id="importTablesCollapse" class="import-tables hidden">
             <summary id="importTablesSummary" class="import-tables-summary">CSV tables in ZIP</summary>

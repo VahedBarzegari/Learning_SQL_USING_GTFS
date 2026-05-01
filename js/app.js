@@ -444,12 +444,20 @@
 
         var lab = document.createElement("label");
         lab.htmlFor = cbId;
-        lab.title = ent.zipPath + " (" + fmtBytes(ent.bytes) + ")";
+        lab.title =
+          ent.zipPath +
+          "\n" +
+          (ent.sizeKind === "csv"
+            ? fmtBytes(ent.bytes) + " (uncompressed text per ZIP metadata)"
+            : fmtBytes(ent.bytes) + " (stored/deflated payload in ZIP — full CSV usually larger)");
+
         lab.textContent = ent.filename + " → table " + ent.suggestedTable;
 
         var sz = document.createElement("span");
         sz.className = "file-size";
-        sz.textContent = fmtBytes(ent.bytes);
+        sz.title = lab.title;
+        sz.textContent =
+          fmtBytes(ent.bytes) + (ent.sizeKind === "csv" ? "" : " (zip)");
 
         row.appendChild(cb);
         row.appendChild(lab);

@@ -1,7 +1,7 @@
 /**
  * Starter queries grouped by difficulty (easy / medium / hard).
- * Auto-expanded to 50 examples per tier. Regenerate: node scripts/emit-presets.cjs
- * `tables`: all listed tables must exist in the built DB before the prompt is clickable.
+ * Regenerate: node scripts/emit-presets.cjs (counts per tier follow emit-presets.cjs)
+ * `tables`: every table listed must exist before the prompt is enabled.
  */
 
 window.GTFS_SQL_PRESET_TIERS = [
@@ -158,34 +158,9 @@ window.GTFS_SQL_PRESETS = {
       sql: `SELECT service_id, date, exception_type FROM calendar_dates ORDER BY date LIMIT 40;`,
     },
     {
-      title: "Stop_times skim — slice 1 of rows",
+      title: "Peek stop_times — ordered timetable sample",
       tables: ["stop_times"],
-      sql: `SELECT trip_id, stop_sequence, departure_time FROM stop_times ORDER BY trip_id, stop_sequence LIMIT 45 OFFSET 0;`,
-    },
-    {
-      title: "Stop_times skim — slice 2 of rows",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, stop_sequence, departure_time FROM stop_times ORDER BY trip_id, stop_sequence LIMIT 45 OFFSET 200;`,
-    },
-    {
-      title: "Stop_times skim — slice 3 of rows",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, stop_sequence, departure_time FROM stop_times ORDER BY trip_id, stop_sequence LIMIT 45 OFFSET 400;`,
-    },
-    {
-      title: "Stop_times skim — slice 4 of rows",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, stop_sequence, departure_time FROM stop_times ORDER BY trip_id, stop_sequence LIMIT 45 OFFSET 600;`,
-    },
-    {
-      title: "Stop_times skim — slice 5 of rows",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, stop_sequence, departure_time FROM stop_times ORDER BY trip_id, stop_sequence LIMIT 45 OFFSET 800;`,
-    },
-    {
-      title: "Stop_times skim — slice 6 of rows",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, stop_sequence, departure_time FROM stop_times ORDER BY trip_id, stop_sequence LIMIT 45 OFFSET 1000;`,
+      sql: `SELECT trip_id, stop_sequence, departure_time FROM stop_times ORDER BY trip_id, stop_sequence LIMIT 50;`,
     },
     {
       title: "COUNT — stop_times timetable rows",
@@ -272,6 +247,256 @@ SELECT 'stops', CAST(COUNT(*) AS TEXT) FROM stops;`,
       title: "SQLite — quote() safe string escaping demo",
       tables: [],
       sql: `SELECT quote('single-quoted literals') AS safe_literal;`,
+    },
+    {
+      title: "Show all routes",
+      tables: ["routes"],
+      sql: `SELECT * FROM routes;`,
+    },
+    {
+      title: "Show route_id and route_long_name",
+      tables: ["routes"],
+      sql: `SELECT route_id, route_long_name FROM routes;`,
+    },
+    {
+      title: "Show first 10 stops",
+      tables: ["stops"],
+      sql: `SELECT * FROM stops LIMIT 10;`,
+    },
+    {
+      title: "Show all trips",
+      tables: ["trips"],
+      sql: `SELECT * FROM trips;`,
+    },
+    {
+      title: "Show stop names only",
+      tables: ["stops"],
+      sql: `SELECT stop_name FROM stops;`,
+    },
+    {
+      title: "Show route types",
+      tables: ["routes"],
+      sql: `SELECT route_type FROM routes;`,
+    },
+    {
+      title: "Show agency info",
+      tables: ["agency"],
+      sql: `SELECT * FROM agency;`,
+    },
+    {
+      title: "Show unique route types",
+      tables: ["routes"],
+      sql: `SELECT DISTINCT route_type FROM routes;`,
+    },
+    {
+      title: "Show unique stop names",
+      tables: ["stops"],
+      sql: `SELECT DISTINCT stop_name FROM stops;`,
+    },
+    {
+      title: "Show first 5 trips",
+      tables: ["trips"],
+      sql: `SELECT * FROM trips LIMIT 5;`,
+    },
+    {
+      title: "Find all bus routes",
+      tables: ["routes"],
+      sql: `SELECT * FROM routes WHERE route_type = 3;`,
+    },
+    {
+      title: "Find stops containing 'Toronto'",
+      tables: ["stops"],
+      sql: `SELECT * FROM stops WHERE stop_name LIKE '%Toronto%';`,
+    },
+    {
+      title: "Trips for route 10",
+      tables: ["trips"],
+      sql: `SELECT * FROM trips WHERE route_id = '10';`,
+    },
+    {
+      title: "Stops with latitude > 43.7",
+      tables: ["stops"],
+      sql: `SELECT * FROM stops WHERE stop_lat > 43.7;`,
+    },
+    {
+      title: "Stop times for a trip",
+      tables: ["stop_times"],
+      sql: `SELECT * FROM stop_times WHERE trip_id = '1001';`,
+    },
+    {
+      title: "Routes starting with 5",
+      tables: ["routes"],
+      sql: `SELECT * FROM routes WHERE route_short_name LIKE '5%';`,
+    },
+    {
+      title: "Trips direction 0",
+      tables: ["trips"],
+      sql: `SELECT * FROM trips WHERE direction_id = 0;`,
+    },
+    {
+      title: "Stops with 'Station'",
+      tables: ["stops"],
+      sql: `SELECT * FROM stops WHERE stop_name LIKE '%Station%';`,
+    },
+    {
+      title: "Trips with WEEKDAY service",
+      tables: ["trips"],
+      sql: `SELECT * FROM trips WHERE service_id = 'WEEKDAY';`,
+    },
+    {
+      title: "Stop_times first stops",
+      tables: ["stop_times"],
+      sql: `SELECT * FROM stop_times WHERE stop_sequence = 1;`,
+    },
+    {
+      title: "Sort stops by name",
+      tables: ["stops"],
+      sql: `SELECT * FROM stops ORDER BY stop_name;`,
+    },
+    {
+      title: "Sort routes descending",
+      tables: ["routes"],
+      sql: `SELECT * FROM routes ORDER BY route_id DESC;`,
+    },
+    {
+      title: "Sort trips by route",
+      tables: ["trips"],
+      sql: `SELECT * FROM trips ORDER BY route_id;`,
+    },
+    {
+      title: "Sort stops by latitude",
+      tables: ["stops"],
+      sql: `SELECT * FROM stops ORDER BY stop_lat DESC;`,
+    },
+    {
+      title: "Sort stop_times",
+      tables: ["stop_times"],
+      sql: `SELECT * FROM stop_times ORDER BY trip_id, stop_sequence;`,
+    },
+    {
+      title: "Count routes",
+      tables: ["routes"],
+      sql: `SELECT COUNT(*) FROM routes;`,
+    },
+    {
+      title: "Count stops",
+      tables: ["stops"],
+      sql: `SELECT COUNT(*) FROM stops;`,
+    },
+    {
+      title: "Trips per route",
+      tables: ["trips"],
+      sql: `SELECT route_id, COUNT(*) FROM trips GROUP BY route_id;`,
+    },
+    {
+      title: "Stops per trip",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, COUNT(*) FROM stop_times GROUP BY trip_id;`,
+    },
+    {
+      title: "Distinct route types count",
+      tables: ["routes"],
+      sql: `SELECT COUNT(DISTINCT route_type) FROM routes;`,
+    },
+    {
+      title: "Count station stops",
+      tables: ["stops"],
+      sql: `SELECT COUNT(*) FROM stops WHERE stop_name LIKE '%Station%';`,
+    },
+    {
+      title: "Max stop_sequence",
+      tables: ["stop_times"],
+      sql: `SELECT MAX(stop_sequence) FROM stop_times;`,
+    },
+    {
+      title: "Min stop_sequence",
+      tables: ["stop_times"],
+      sql: `SELECT MIN(stop_sequence) FROM stop_times;`,
+    },
+    {
+      title: "Avg stop_sequence",
+      tables: ["stop_times"],
+      sql: `SELECT AVG(stop_sequence) FROM stop_times;`,
+    },
+    {
+      title: "Trips per service",
+      tables: ["trips"],
+      sql: `SELECT service_id, COUNT(*) FROM trips GROUP BY service_id;`,
+    },
+    {
+      title: "Routes with >10 trips",
+      tables: ["trips"],
+      sql: `SELECT route_id, COUNT(*) FROM trips GROUP BY route_id HAVING COUNT(*) > 10;`,
+    },
+    {
+      title: "Trips with >20 stops",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, COUNT(*) FROM stop_times GROUP BY trip_id HAVING COUNT(*) > 20;`,
+    },
+    {
+      title: "Duplicate route names",
+      tables: ["routes"],
+      sql: `SELECT route_long_name, COUNT(DISTINCT route_id) FROM routes GROUP BY route_long_name HAVING COUNT(DISTINCT route_id) > 1;`,
+    },
+    {
+      title: "Busy stops",
+      tables: ["stop_times"],
+      sql: `SELECT stop_id, COUNT(*) FROM stop_times GROUP BY stop_id HAVING COUNT(*) > 50;`,
+    },
+    {
+      title: "Busy services",
+      tables: ["trips"],
+      sql: `SELECT service_id, COUNT(*) FROM trips GROUP BY service_id HAVING COUNT(*) > 100;`,
+    },
+    {
+      title: "Route type counts",
+      tables: ["routes"],
+      sql: `SELECT route_type, COUNT(*) FROM routes GROUP BY route_type;`,
+    },
+    {
+      title: "Stops grouped by name",
+      tables: ["stops"],
+      sql: `SELECT stop_name, COUNT(*) FROM stops GROUP BY stop_name;`,
+    },
+    {
+      title: "Trips per direction",
+      tables: ["trips"],
+      sql: `SELECT direction_id, COUNT(*) FROM trips GROUP BY direction_id;`,
+    },
+    {
+      title: "Duplicate stop names",
+      tables: ["stops"],
+      sql: `SELECT stop_name, COUNT(*) FROM stops GROUP BY stop_name HAVING COUNT(*) > 1;`,
+    },
+    {
+      title: "Stops per route",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, COUNT(*) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY t.route_id;`,
+    },
+    {
+      title: "Trips with route names",
+      tables: ["routes","trips"],
+      sql: `SELECT t.trip_id, r.route_long_name FROM trips t JOIN routes r ON t.route_id = r.route_id;`,
+    },
+    {
+      title: "Stop names per trip",
+      tables: ["stops","stop_times"],
+      sql: `SELECT st.trip_id, s.stop_name FROM stop_times st JOIN stops s ON st.stop_id = s.stop_id;`,
+    },
+    {
+      title: "Trip with short name",
+      tables: ["routes","trips"],
+      sql: `SELECT t.trip_id, r.route_short_name FROM trips t JOIN routes r ON t.route_id = r.route_id;`,
+    },
+    {
+      title: "Stop sequence for trip",
+      tables: ["stops","stop_times"],
+      sql: `SELECT st.stop_sequence, s.stop_name FROM stop_times st JOIN stops s ON st.stop_id = s.stop_id WHERE st.trip_id = '1001' ORDER BY st.stop_sequence;`,
+    },
+    {
+      title: "Count stops per route",
+      tables: ["routes","trips","stop_times"],
+      sql: `SELECT r.route_id, COUNT(*) FROM routes r JOIN trips t ON r.route_id = t.route_id JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY r.route_id;`,
     }
   ],
 
@@ -323,14 +548,9 @@ AND CAST(stop_lon AS REAL) BETWEEN -80 AND -79
 LIMIT 40;`,
     },
     {
-      title: "Trip volume by direction_id = 0",
+      title: "Trips aggregated by direction_id",
       tables: ["trips"],
-      sql: `SELECT COUNT(*) AS n FROM trips WHERE direction_id IS NOT NULL AND CAST(direction_id AS INTEGER) = 0;`,
-    },
-    {
-      title: "Trip volume by direction_id = 1",
-      tables: ["trips"],
-      sql: `SELECT COUNT(*) AS n FROM trips WHERE direction_id IS NOT NULL AND CAST(direction_id AS INTEGER) = 1;`,
+      sql: `SELECT direction_id, COUNT(*) AS trips FROM trips GROUP BY direction_id ORDER BY CAST(direction_id AS INTEGER);`,
     },
     {
       title: "JOIN trips and routes sample flat rows",
@@ -376,29 +596,9 @@ FROM routes LIMIT 30;`,
       sql: `SELECT COUNT(*) AS n FROM stop_times WHERE departure_time >= '24:00:00';`,
     },
     {
-      title: "Morning departures — between 6:00:00 and 7:00:00 (TEXT compare)",
+      title: "Stop_times morning window (TEXT time compare)",
       tables: ["stop_times"],
-      sql: `SELECT trip_id, departure_time FROM stop_times WHERE departure_time >= '6:00:00' AND departure_time < '7:00:00' LIMIT 35;`,
-    },
-    {
-      title: "Morning departures — between 7:00:00 and 8:00:00 (TEXT compare)",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, departure_time FROM stop_times WHERE departure_time >= '7:00:00' AND departure_time < '8:00:00' LIMIT 35;`,
-    },
-    {
-      title: "Morning departures — between 8:00:00 and 9:00:00 (TEXT compare)",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, departure_time FROM stop_times WHERE departure_time >= '8:00:00' AND departure_time < '9:00:00' LIMIT 35;`,
-    },
-    {
-      title: "Morning departures — between 9:00:00 and 10:00:00 (TEXT compare)",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, departure_time FROM stop_times WHERE departure_time >= '9:00:00' AND departure_time < '10:00:00' LIMIT 35;`,
-    },
-    {
-      title: "Morning departures — between 10:00:00 and 11:00:00 (TEXT compare)",
-      tables: ["stop_times"],
-      sql: `SELECT trip_id, departure_time FROM stop_times WHERE departure_time >= '10:00:00' AND departure_time < '11:00:00' LIMIT 35;`,
+      sql: `SELECT trip_id, departure_time FROM stop_times WHERE departure_time >= '06:00:00' AND departure_time < '11:00:00' ORDER BY departure_time LIMIT 50;`,
     },
     {
       title: "Join transfer rules with from_stop name",
@@ -439,129 +639,244 @@ LIMIT 15;`,
       sql: `SELECT a.agency_name, COUNT(*) AS routes FROM routes AS r LEFT JOIN agency AS a ON CAST(a.agency_id AS TEXT) = CAST(r.agency_id AS TEXT) GROUP BY a.agency_name ORDER BY routes DESC LIMIT 15;`,
     },
     {
-      title: "Service trip density rank 1..25",
+      title: "Top calendar services ranked by scheduled trip totals",
       tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 0;`,
+      sql: `SELECT service_id, COUNT(*) AS trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 25;`,
     },
     {
-      title: "Service trip density rank 2..26",
+      title: "Count trips per route ordered descending",
       tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 1;`,
+      sql: `SELECT route_id, COUNT(*) AS trips FROM trips GROUP BY route_id ORDER BY trips DESC;`,
     },
     {
-      title: "Service trip density rank 3..27",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 2;`,
+      title: "Find routes with no trips",
+      tables: ["routes","trips"],
+      sql: `SELECT r.route_id FROM routes r LEFT JOIN trips t ON r.route_id = t.route_id WHERE t.trip_id IS NULL;`,
     },
     {
-      title: "Service trip density rank 4..28",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 3;`,
+      title: "Count stops per route (distinct)",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, COUNT(DISTINCT st.stop_id) FROM trips t JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY t.route_id;`,
     },
     {
-      title: "Service trip density rank 5..29",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 4;`,
+      title: "Find trips with maximum stops",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, COUNT(*) AS stops FROM stop_times GROUP BY trip_id ORDER BY stops DESC LIMIT 5;`,
     },
     {
-      title: "Service trip density rank 6..30",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 5;`,
+      title: "First stop of each trip",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, stop_id FROM stop_times WHERE stop_sequence = 1;`,
     },
     {
-      title: "Service trip density rank 7..31",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 6;`,
+      title: "Last stop of each trip",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, stop_id FROM stop_times WHERE stop_sequence = (SELECT MAX(stop_sequence) FROM stop_times st2 WHERE st2.trip_id = stop_times.trip_id);`,
     },
     {
-      title: "Service trip density rank 8..32",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 7;`,
+      title: "Join trips with routes and filter buses",
+      tables: ["routes","trips"],
+      sql: `SELECT t.trip_id, r.route_long_name FROM trips t JOIN routes r ON t.route_id = r.route_id WHERE r.route_type = 3;`,
     },
     {
-      title: "Service trip density rank 9..33",
+      title: "Count trips per direction",
       tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 8;`,
+      sql: `SELECT route_id, direction_id, COUNT(*) FROM trips GROUP BY route_id, direction_id;`,
     },
     {
-      title: "Service trip density rank 10..34",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 9;`,
+      title: "Find stops used by most trips",
+      tables: ["stop_times"],
+      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) AS trips FROM stop_times GROUP BY stop_id ORDER BY trips DESC LIMIT 10;`,
     },
     {
-      title: "Service trip density rank 11..35",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 10;`,
+      title: "Average stops per trip",
+      tables: ["stop_times"],
+      sql: `SELECT AVG(cnt) FROM (SELECT trip_id, COUNT(*) AS cnt FROM stop_times GROUP BY trip_id);`,
     },
     {
-      title: "Service trip density rank 12..36",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 11;`,
+      title: "Trips with duplicate stop_sequence",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id FROM stop_times GROUP BY trip_id, stop_sequence HAVING COUNT(*) > 1;`,
     },
     {
-      title: "Service trip density rank 13..37",
+      title: "Routes with both directions",
       tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 12;`,
+      sql: `SELECT route_id FROM trips GROUP BY route_id HAVING COUNT(DISTINCT direction_id) = 2;`,
     },
     {
-      title: "Service trip density rank 14..38",
+      title: "Count trips per service_id ordered",
       tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 13;`,
+      sql: `SELECT service_id, COUNT(*) FROM trips GROUP BY service_id ORDER BY COUNT(*) DESC;`,
     },
     {
-      title: "Service trip density rank 15..39",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 14;`,
+      title: "Stops not used in stop_times",
+      tables: ["stops","stop_times"],
+      sql: `SELECT s.stop_id FROM stops s LEFT JOIN stop_times st ON s.stop_id = st.stop_id WHERE st.stop_id IS NULL;`,
     },
     {
-      title: "Service trip density rank 16..40",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 15;`,
+      title: "Trips with missing stop_sequence",
+      tables: ["stop_times"],
+      sql: `SELECT * FROM stop_times WHERE stop_sequence IS NULL;`,
     },
     {
-      title: "Service trip density rank 17..41",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 16;`,
+      title: "Find earliest departure per trip",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, MIN(departure_time) FROM stop_times GROUP BY trip_id;`,
     },
     {
-      title: "Service trip density rank 18..42",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 17;`,
+      title: "Find latest departure per trip",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, MAX(departure_time) FROM stop_times GROUP BY trip_id;`,
     },
     {
-      title: "Service trip density rank 19..43",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 18;`,
+      title: "Trips with only one stop",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id FROM stop_times GROUP BY trip_id HAVING COUNT(*) = 1;`,
     },
     {
-      title: "Service trip density rank 20..44",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 19;`,
+      title: "Count stops per route and direction",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, t.direction_id, COUNT(*) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY t.route_id, t.direction_id;`,
     },
     {
-      title: "Service trip density rank 21..45",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 20;`,
+      title: "Find most common stop name",
+      tables: ["stops"],
+      sql: `SELECT stop_name, COUNT(*) FROM stops GROUP BY stop_name ORDER BY COUNT(*) DESC LIMIT 1;`,
     },
     {
-      title: "Service trip density rank 22..46",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 21;`,
+      title: "Routes sharing same long name",
+      tables: ["routes"],
+      sql: `SELECT route_long_name, COUNT(*) FROM routes GROUP BY route_long_name HAVING COUNT(*) > 1;`,
     },
     {
-      title: "Service trip density rank 23..47",
+      title: "Trips per route ordered",
       tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 22;`,
+      sql: `SELECT route_id, COUNT(*) FROM trips GROUP BY route_id ORDER BY COUNT(*) DESC;`,
     },
     {
-      title: "Service trip density rank 24..48",
-      tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 23;`,
+      title: "Stops appearing in multiple routes",
+      tables: ["trips","stop_times"],
+      sql: `SELECT st.stop_id FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY st.stop_id HAVING COUNT(DISTINCT t.route_id) > 1;`,
     },
     {
-      title: "Service trip density rank 25..49",
+      title: "Trips with same stop pattern count",
+      tables: ["stop_times"],
+      sql: `SELECT COUNT(*) FROM (SELECT trip_id, GROUP_CONCAT(stop_id) FROM stop_times GROUP BY trip_id);`,
+    },
+    {
+      title: "Count distinct stops per service",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.service_id, COUNT(DISTINCT st.stop_id) FROM trips t JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY t.service_id;`,
+    },
+    {
+      title: "Find busiest route by stop_times",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, COUNT(*) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY t.route_id ORDER BY COUNT(*) DESC LIMIT 1;`,
+    },
+    {
+      title: "Trips with gaps in stop_sequence",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id FROM stop_times GROUP BY trip_id HAVING MAX(stop_sequence) - COUNT(*) > 0;`,
+    },
+    {
+      title: "Stops with highest sequence number",
+      tables: ["stop_times"],
+      sql: `SELECT stop_id, MAX(stop_sequence) FROM stop_times GROUP BY stop_id ORDER BY MAX(stop_sequence) DESC LIMIT 5;`,
+    },
+    {
+      title: "Trips sorted by number of stops",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id, COUNT(*) FROM stop_times GROUP BY trip_id ORDER BY COUNT(*) DESC;`,
+    },
+    {
+      title: "Count routes per agency",
+      tables: ["routes"],
+      sql: `SELECT agency_id, COUNT(*) FROM routes GROUP BY agency_id;`,
+    },
+    {
+      title: "Trips without stop_times",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.trip_id FROM trips t LEFT JOIN stop_times st ON t.trip_id = st.trip_id WHERE st.trip_id IS NULL;`,
+    },
+    {
+      title: "Find route with most trips",
       tables: ["trips"],
-      sql: `SELECT service_id, COUNT(*) trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 15 OFFSET 24;`,
+      sql: `SELECT route_id FROM trips GROUP BY route_id ORDER BY COUNT(*) DESC LIMIT 1;`,
+    },
+    {
+      title: "Stops used by only one trip",
+      tables: ["stop_times"],
+      sql: `SELECT stop_id FROM stop_times GROUP BY stop_id HAVING COUNT(DISTINCT trip_id) = 1;`,
+    },
+    {
+      title: "Trips per hour (if time exists)",
+      tables: ["stop_times"],
+      sql: `SELECT SUBSTR(departure_time,1,2) AS hour, COUNT(*) FROM stop_times GROUP BY hour;`,
+    },
+    {
+      title: "Find routes with no stops",
+      tables: ["routes","trips","stop_times"],
+      sql: `SELECT r.route_id FROM routes r LEFT JOIN trips t ON r.route_id = t.route_id LEFT JOIN stop_times st ON t.trip_id = st.trip_id WHERE st.stop_id IS NULL;`,
+    },
+    {
+      title: "Trips with same first stop",
+      tables: ["stop_times"],
+      sql: `SELECT stop_id, COUNT(*) FROM stop_times WHERE stop_sequence = 1 GROUP BY stop_id ORDER BY COUNT(*) DESC;`,
+    },
+    {
+      title: "Trips with same last stop",
+      tables: ["stop_times"],
+      sql: `SELECT stop_id, COUNT(*) FROM stop_times WHERE stop_sequence = (SELECT MAX(stop_sequence) FROM stop_times st2 WHERE st2.trip_id = stop_times.trip_id) GROUP BY stop_id ORDER BY COUNT(*) DESC;`,
+    },
+    {
+      title: "Count stops per route_long_name",
+      tables: ["routes","trips","stop_times"],
+      sql: `SELECT r.route_long_name, COUNT(*) FROM routes r JOIN trips t ON r.route_id = t.route_id JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY r.route_long_name;`,
+    },
+    {
+      title: "Trips with no direction_id",
+      tables: ["trips"],
+      sql: `SELECT * FROM trips WHERE direction_id IS NULL;`,
+    },
+    {
+      title: "Count trips per route_type",
+      tables: ["routes","trips"],
+      sql: `SELECT r.route_type, COUNT(*) FROM trips t JOIN routes r ON t.route_id = r.route_id GROUP BY r.route_type;`,
+    },
+    {
+      title: "Stops grouped by latitude band",
+      tables: ["stops"],
+      sql: `SELECT ROUND(stop_lat,1), COUNT(*) FROM stops GROUP BY ROUND(stop_lat,1);`,
+    },
+    {
+      title: "Trips grouped by shape_id",
+      tables: ["trips"],
+      sql: `SELECT shape_id, COUNT(*) FROM trips GROUP BY shape_id;`,
+    },
+    {
+      title: "Routes with multiple shapes",
+      tables: ["trips"],
+      sql: `SELECT route_id FROM trips GROUP BY route_id HAVING COUNT(DISTINCT shape_id) > 1;`,
+    },
+    {
+      title: "Find stops with highest usage",
+      tables: ["stop_times"],
+      sql: `SELECT stop_id, COUNT(*) FROM stop_times GROUP BY stop_id ORDER BY COUNT(*) DESC LIMIT 10;`,
+    },
+    {
+      title: "Trips with identical stop count",
+      tables: ["stop_times"],
+      sql: `SELECT COUNT(*), cnt FROM (SELECT trip_id, COUNT(*) AS cnt FROM stop_times GROUP BY trip_id) GROUP BY cnt;`,
+    },
+    {
+      title: "Find most frequent departure hour",
+      tables: ["stop_times"],
+      sql: `SELECT SUBSTR(departure_time,1,2) AS hour, COUNT(*) FROM stop_times GROUP BY hour ORDER BY COUNT(*) DESC LIMIT 1;`,
+    },
+    {
+      title: "Stops per route ordered descending",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, COUNT(DISTINCT st.stop_id) FROM trips t JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY t.route_id ORDER BY COUNT(*) DESC;`,
     }
   ],
 
@@ -753,292 +1068,133 @@ LIMIT 30;`,
       sql: `PRAGMA table_info(trips);`,
     },
     {
-      title: "Ranked stop visits window slice 1",
+      title: "Rank stops by DISTINCT trips served (heavy stops)",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
+      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) AS distinct_trips
 FROM stop_times
 GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 0;`,
+ORDER BY distinct_trips DESC
+LIMIT 30;`,
     },
     {
-      title: "Ranked stop visits window slice 2",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 3;`,
+      title: "Calculate headway (avg time diff between trips per route)",
+      tables: ["trips","stop_times"],
+      sql: `SELECT route_id, AVG(diff) AS avg_headway FROM (  SELECT t.route_id,         (strftime('%s', st2.departure_time) - strftime('%s', st1.departure_time)) AS diff  FROM stop_times st1  JOIN stop_times st2     ON st1.trip_id != st2.trip_id  JOIN trips t ON st1.trip_id = t.trip_id  WHERE st1.stop_sequence = 1 AND st2.stop_sequence = 1) GROUP BY route_id;`,
     },
     {
-      title: "Ranked stop visits window slice 3",
+      title: "Find longest trip duration",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 6;`,
+      sql: `SELECT trip_id, MAX(departure_time) - MIN(departure_time) AS duration FROM stop_times GROUP BY trip_id ORDER BY duration DESC LIMIT 5;`,
     },
     {
-      title: "Ranked stop visits window slice 4",
+      title: "Detect inconsistent stop_sequence gaps",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 9;`,
+      sql: `SELECT trip_id FROM stop_times GROUP BY trip_id HAVING MAX(stop_sequence) != COUNT(*);`,
     },
     {
-      title: "Ranked stop visits window slice 5",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 12;`,
+      title: "Find routes with most overlapping stops",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t1.route_id, t2.route_id, COUNT(*) AS common_stops FROM stop_times st1 JOIN stop_times st2 ON st1.stop_id = st2.stop_id JOIN trips t1 ON st1.trip_id = t1.trip_id JOIN trips t2 ON st2.trip_id = t2.trip_id WHERE t1.route_id != t2.route_id GROUP BY t1.route_id, t2.route_id ORDER BY common_stops DESC LIMIT 10;`,
     },
     {
-      title: "Ranked stop visits window slice 6",
+      title: "Identify duplicate trip patterns",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 15;`,
+      sql: `SELECT GROUP_CONCAT(stop_id), COUNT(*) FROM stop_times GROUP BY trip_id HAVING COUNT(*) > 1;`,
     },
     {
-      title: "Ranked stop visits window slice 7",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 18;`,
+      title: "Find routes with inconsistent directions",
+      tables: ["trips"],
+      sql: `SELECT route_id FROM trips GROUP BY route_id HAVING COUNT(DISTINCT direction_id) != 2;`,
     },
     {
-      title: "Ranked stop visits window slice 8",
+      title: "Calculate average speed (distance/time if shape_dist_traveled exists)",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 21;`,
+      sql: `SELECT trip_id, MAX(shape_dist_traveled) /  (MAX(departure_time) - MIN(departure_time)) AS speed FROM stop_times GROUP BY trip_id;`,
     },
     {
-      title: "Ranked stop visits window slice 9",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 24;`,
+      title: "Find routes with highest stop density",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, COUNT(*) / COUNT(DISTINCT st.trip_id) AS avg_stops FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY t.route_id ORDER BY avg_stops DESC;`,
     },
     {
-      title: "Ranked stop visits window slice 10",
+      title: "Detect trips with loops (repeated stops)",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 27;`,
+      sql: `SELECT trip_id FROM stop_times GROUP BY trip_id, stop_id HAVING COUNT(*) > 1;`,
     },
     {
-      title: "Ranked stop visits window slice 11",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 30;`,
+      title: "Rank routes by trip count",
+      tables: ["trips"],
+      sql: `SELECT route_id, RANK() OVER (ORDER BY COUNT(*) DESC) AS rank FROM trips GROUP BY route_id;`,
     },
     {
-      title: "Ranked stop visits window slice 12",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 33;`,
+      title: "Find longest route (most unique stops)",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, COUNT(DISTINCT st.stop_id) AS stops FROM trips t JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY t.route_id ORDER BY stops DESC LIMIT 1;`,
     },
     {
-      title: "Ranked stop visits window slice 13",
+      title: "Detect missing departure times",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 36;`,
+      sql: `SELECT * FROM stop_times WHERE departure_time IS NULL;`,
     },
     {
-      title: "Ranked stop visits window slice 14",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 39;`,
+      title: "Compute trip duration per route",
+      tables: ["trips","stop_times"],
+      sql: `SELECT t.route_id, AVG(MAX(st.departure_time) - MIN(st.departure_time)) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY t.route_id;`,
     },
     {
-      title: "Ranked stop visits window slice 15",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 42;`,
+      title: "Identify routes sharing identical stop sets",
+      tables: ["trips","stop_times"],
+      sql: `SELECT route_id, GROUP_CONCAT(DISTINCT stop_id) FROM trips t JOIN stop_times st ON t.trip_id = st.trip_id GROUP BY route_id;`,
     },
     {
-      title: "Ranked stop visits window slice 16",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 45;`,
+      title: "Find stops with highest transfer potential",
+      tables: ["trips","stop_times"],
+      sql: `SELECT stop_id, COUNT(DISTINCT route_id) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY stop_id ORDER BY COUNT(*) DESC LIMIT 10;`,
     },
     {
-      title: "Ranked stop visits window slice 17",
+      title: "Trips with irregular time gaps",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 48;`,
+      sql: `SELECT trip_id FROM ( SELECT trip_id, (strftime('%s', departure_time) -   LAG(strftime('%s', departure_time)) OVER (PARTITION BY trip_id ORDER BY stop_sequence)) AS gap FROM stop_times) WHERE gap < 0;`,
     },
     {
-      title: "Ranked stop visits window slice 18",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 51;`,
+      title: "Compute route coverage (bounding box)",
+      tables: ["stops"],
+      sql: `SELECT MIN(stop_lat), MAX(stop_lat), MIN(stop_lon), MAX(stop_lon) FROM stops;`,
     },
     {
-      title: "Ranked stop visits window slice 19",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 54;`,
+      title: "Find most central stop (used in most routes)",
+      tables: ["trips","stop_times"],
+      sql: `SELECT stop_id, COUNT(DISTINCT route_id) FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY stop_id ORDER BY COUNT(*) DESC LIMIT 1;`,
     },
     {
-      title: "Ranked stop visits window slice 20",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 57;`,
+      title: "Detect trips with missing stops",
+      tables: ["trips","stop_times"],
+      sql: `SELECT trip_id FROM trips WHERE trip_id NOT IN (SELECT DISTINCT trip_id FROM stop_times);`,
     },
     {
-      title: "Ranked stop visits window slice 21",
+      title: "Calculate average headway per hour",
       tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 60;`,
+      sql: `SELECT SUBSTR(departure_time,1,2) AS hour, AVG(diff) FROM ( SELECT departure_time, (strftime('%s', departure_time) -  LAG(strftime('%s', departure_time)) OVER (ORDER BY departure_time)) AS diff FROM stop_times WHERE stop_sequence = 1) GROUP BY hour;`,
     },
     {
-      title: "Ranked stop visits window slice 22",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 63;`,
+      title: "Find longest gap between trips per route",
+      tables: ["trips","stop_times"],
+      sql: `SELECT route_id, MAX(diff) FROM ( SELECT t.route_id, (strftime('%s', st2.departure_time) -  strftime('%s', st1.departure_time)) AS diff FROM stop_times st1 JOIN stop_times st2 ON st1.trip_id != st2.trip_id JOIN trips t ON st1.trip_id = t.trip_id) GROUP BY route_id;`,
     },
     {
-      title: "Ranked stop visits window slice 23",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 66;`,
+      title: "Identify routes with extreme travel times",
+      tables: ["trips","stop_times"],
+      sql: `SELECT route_id, MAX(duration) - MIN(duration) FROM ( SELECT t.route_id, MAX(st.departure_time) - MIN(st.departure_time) AS duration FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id GROUP BY st.trip_id) GROUP BY route_id;`,
     },
     {
-      title: "Ranked stop visits window slice 24",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 69;`,
+      title: "Stops farthest apart (rough)",
+      tables: ["stops"],
+      sql: `SELECT s1.stop_id, s2.stop_id, ((s1.stop_lat - s2.stop_lat)*(s1.stop_lat - s2.stop_lat) +  (s1.stop_lon - s2.stop_lon)*(s1.stop_lon - s2.stop_lon)) AS dist FROM stops s1, stops s2 ORDER BY dist DESC LIMIT 1;`,
     },
     {
-      title: "Ranked stop visits window slice 25",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 72;`,
-    },
-    {
-      title: "Ranked stop visits window slice 26",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 75;`,
-    },
-    {
-      title: "Ranked stop visits window slice 27",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 78;`,
-    },
-    {
-      title: "Ranked stop visits window slice 28",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 81;`,
-    },
-    {
-      title: "Ranked stop visits window slice 29",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 84;`,
-    },
-    {
-      title: "Ranked stop visits window slice 30",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 87;`,
-    },
-    {
-      title: "Ranked stop visits window slice 31",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 90;`,
-    },
-    {
-      title: "Ranked stop visits window slice 32",
-      tables: ["stop_times"],
-      sql: `SELECT stop_id, COUNT(DISTINCT trip_id) hits
-FROM stop_times
-GROUP BY stop_id
-ORDER BY hits DESC
-LIMIT 20 OFFSET 93;`,
+      title: "Identify peak route usage per hour",
+      tables: ["trips","stop_times"],
+      sql: `SELECT route_id, hour, COUNT(*) FROM ( SELECT t.route_id, SUBSTR(st.departure_time,1,2) AS hour FROM stop_times st JOIN trips t ON st.trip_id = t.trip_id) GROUP BY route_id, hour ORDER BY COUNT(*) DESC;`,
     }
   ],
 };

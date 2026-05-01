@@ -29,9 +29,58 @@
   }
 
   /**
+   * JSZip exposes per-file payload on `_data`; `entry.uncompressedSize` is often undefined.
+   * @param {*} entry file from zipRoot.forEach
+   * @returns {{ bytes:number, sizeKind:string, defaultChecked:boolean }}
+   */
+  function zipTxtEntrySizing(entry) {
+    var d = entry && entry._data;
+    /** uncompressed CSV/text size when present in ZIP metadata */
+    var uncompressed =
+      typeof entry.uncompressedSize === "number"
+        ? entry.uncompressedSize
+        : d && typeof d.uncompressedSize === "number"
+          ? d.uncompressedSize
+          : null;
+    var compressed =
+      typeof entry.compressedSize === "number"
+        ? entry.compressedSize
+        : d && typeof d.compressedSize === "number"
+          ? d.compressedSize
+          : null;
+
+    /** @type {'csv'|'zip'} */
+    var sizeKind;
+    /** @type {number} */
+    var bytes = 0;
+
+    if (typeof uncompressed === "number" && !isNaN(uncompressed) && uncompressed >= 0) {
+      bytes = Math.max(0, Math.floor(Number(uncompressed)));
+      sizeKind = "csv";
+    } else if (typeof compressed === "number" && !isNaN(compressed) && compressed >= 0) {
+      bytes = Math.max(0, Math.floor(Number(compressed)));
+      sizeKind = "zip";
+    } else if (d && d.compressedContent) {
+      var raw = d.compressedContent;
+      if (typeof raw.length === "number") bytes = Math.max(0, raw.length | 0);
+      else if (typeof raw.byteLength === "number") bytes = Math.max(0, Math.floor(Number(raw.byteLength)));
+      sizeKind = "zip";
+    } else {
+      sizeKind = "zip";
+      bytes = 0;
+    }
+
+    /** when only deflated ZIP payload bytes are known, be conservative enabling by default */
+    var SAFE_PAYLOAD = 3 * 1024 * 1024;
+    var defaultChecked = sizeKind === "csv" ? bytes <= LARGE_BYTES : bytes <= SAFE_PAYLOAD;
+
+    return { bytes: bytes, sizeKind: sizeKind, defaultChecked: defaultChecked };
+  }
+
+  /**
    * Enumerate CSV-like *.txt tables inside an already-loaded ZIP.
    * @param {JSZip} zipRoot
-   * @returns {{zipPath:string,filename:string,suggestedTable:string,bytes:number,defaultChecked:boolean}[]}
+   * @returns {{zipPath:string,filename:string,suggestedTable:string,bytes:number,sizeKind:string,defaultChecked:boolean}[]}
    */
   function describeTxtFiles(zipRoot) {
     var out = [];
@@ -43,14 +92,15 @@
       var name = basename(relPath);
       if (!name || name[0] === ".") return;
 
-      var size = typeof entry.uncompressedSize === "number" ? entry.uncompressedSize : 0;
+      var sizing = zipTxtEntrySizing(entry);
 
       out.push({
         zipPath: relPath,
         filename: name,
         suggestedTable: tableNameFromTxtFilename(name),
-        bytes: size,
-        defaultChecked: size <= LARGE_BYTES,
+        bytes: sizing.bytes,
+        sizeKind: sizing.sizeKind,
+        defaultChecked: sizing.defaultChecked,
       });
     });
 
