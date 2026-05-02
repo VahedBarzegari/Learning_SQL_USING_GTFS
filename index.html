@@ -27,11 +27,7 @@
 
       <aside class="side">
         <section class="panel">
-          <h2>Dataset</h2>
-          <p id="datasetHint" class="muted">
-            Load a GTFS ZIP. All tables default to checked; only CSVs that look like headers with no body rows arrive
-            unchecked. Sizes: “(zip)” is ZIP payload footprint; bare numbers come from ZIP uncompressed metadata.
-          </p>
+          <h2 class="sidebar-section-title">Dataset</h2>
           <details id="importTablesCollapse" class="import-tables hidden">
             <summary id="importTablesSummary" class="import-tables-summary">CSV tables in ZIP</summary>
             <div id="fileList" class="file-list" aria-live="polite"></div>
@@ -47,8 +43,7 @@
         </section>
 
         <section class="panel">
-          <h2>Starter queries</h2>
-          <p class="muted small">Expand a difficulty, then choose an example to load into the editor.</p>
+          <h2 class="sidebar-section-title">Examples</h2>
           <div id="starterList" class="starter-tiers" aria-live="polite"></div>
         </section>
       </aside>

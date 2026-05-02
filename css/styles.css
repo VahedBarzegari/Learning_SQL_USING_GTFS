@@ -169,13 +169,13 @@ code {
   border-top: none;
 }
 
-.panel h2 {
-  margin: 0 0 0.55rem;
-  font-size: 0.72rem;
+.side > .panel > h2.sidebar-section-title {
+  margin: 0 0 0.65rem;
+  font-size: 1.06rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
 }
 
 .muted {

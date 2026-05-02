@@ -54,7 +54,6 @@
     els.buildBusy = document.getElementById("buildBusy");
     els.buildBusyMsg = document.getElementById("buildBusyMsg");
     els.tablesList = document.getElementById("tablesList");
-    els.datasetHint = document.getElementById("datasetHint");
     els.sqlEditor = document.getElementById("sqlEditor");
     els.btnRun = document.getElementById("btnRun");
     els.btnClear = document.getElementById("btnClear");
