@@ -217,6 +217,110 @@ const out = { easy: [], medium: [], hard: [] };
     `SELECT service_id, COUNT(*) AS trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 25;`,
   );
 
+  /** SQL CASE — GTFS workbook (adapted placeholders: MD1→trips.service_id; headway→frequencies.headway_secs) */
+  [
+    [
+      "CASE · classify route_type (Bus / Streetcar / Other)",
+      ["routes"],
+      `SELECT route_id,\nCASE\n  WHEN CAST(route_type AS INTEGER) = 3 THEN 'Bus'\n  WHEN CAST(route_type AS INTEGER) = 0 THEN 'Streetcar'\n  ELSE 'Other'\nEND AS service_type\nFROM routes\nLIMIT 50;`,
+    ],
+    [
+      "CASE · Morning vs Evening (stop_times departure)",
+      ["stop_times"],
+      `SELECT trip_id,\nCASE\n  WHEN departure_time < '12:00:00' THEN 'Morning'\n  ELSE 'Evening'\nEND AS period\nFROM stop_times\nLIMIT 120;`,
+    ],
+    [
+      "CASE · Weekday vs Weekend (calendar weekday flags)",
+      ["calendar"],
+      `SELECT service_id,\nCASE\n  WHEN monday IN ('1', 'true') OR tuesday IN ('1', 'true') OR wednesday IN ('1', 'true')\n    OR thursday IN ('1', 'true') OR friday IN ('1', 'true')\n  THEN 'Weekday'\n  ELSE 'Weekend'\nEND AS day_type\nFROM calendar\nLIMIT 45;`,
+    ],
+    [
+      "CASE · AM peak / PM peak / Off-peak (departure_time)",
+      ["stop_times"],
+      `SELECT trip_id,\nCASE\n  WHEN departure_time BETWEEN '07:00:00' AND '09:00:00' THEN 'AM Peak'\n  WHEN departure_time BETWEEN '16:00:00' AND '18:00:00' THEN 'PM Peak'\n  ELSE 'Off-Peak'\nEND AS period\nFROM stop_times\nLIMIT 120;`,
+    ],
+    [
+      "CASE · group service_id MD1 / MD2 as Midday (trips)",
+      ["trips"],
+      `SELECT service_id,\nCASE\n  WHEN service_id IN ('MD1', 'MD2') THEN 'Midday'\n  ELSE CAST(service_id AS TEXT)\nEND AS service_group\nFROM trips\nLIMIT 120;`,
+    ],
+    [
+      "CASE · trip length Short / Medium / Long (stop_sequence buckets)",
+      ["stop_times"],
+      `SELECT trip_id,\nCASE\n  WHEN MAX(CAST(stop_sequence AS INTEGER)) < 20 THEN 'Short'\n  WHEN MAX(CAST(stop_sequence AS INTEGER)) < 50 THEN 'Medium'\n  ELSE 'Long'\nEND AS trip_length\nFROM stop_times\nGROUP BY trip_id\nLIMIT 60;`,
+    ],
+    [
+      "CASE · Express vs Local (numeric route_id hint ≥900)",
+      ["routes"],
+      `SELECT route_id,\nCASE\n  WHEN CAST(route_id AS INTEGER) >= 900 THEN 'Express'\n  ELSE 'Local Bus'\nEND AS category\nFROM routes\nLIMIT 50;`,
+    ],
+    [
+      "CASE · load level Low / Medium / High (stops per trip)",
+      ["stop_times"],
+      `SELECT trip_id,\nCASE\n  WHEN MAX(CAST(stop_sequence AS INTEGER)) > 60 THEN 'High'\n  WHEN MAX(CAST(stop_sequence AS INTEGER)) > 30 THEN 'Medium'\n  ELSE 'Low'\nEND AS load_level\nFROM stop_times\nGROUP BY trip_id\nLIMIT 60;`,
+    ],
+    [
+      "CASE · direction label Outbound / Inbound",
+      ["trips"],
+      `SELECT t.trip_id,\nCASE\n  WHEN CAST(t.direction_id AS INTEGER) = 0 THEN 'Outbound'\n  ELSE 'Inbound'\nEND AS direction_label\nFROM trips AS t\nLIMIT 80;`,
+    ],
+    [
+      "CASE · headway status Missing / Low frequency / Normal (frequencies)",
+      ["frequencies"],
+      `SELECT trip_id,\nCASE\n  WHEN headway_secs IS NULL OR TRIM(CAST(headway_secs AS TEXT)) = '' THEN 'Missing'\n  WHEN CAST(headway_secs AS REAL) > 1800 THEN 'Low Frequency'\n  ELSE 'Normal'\nEND AS headway_status\nFROM frequencies\nLIMIT 60;`,
+    ],
+    [
+      "CASE · Early / Late / Regular (departure_time bands)",
+      ["stop_times"],
+      `SELECT trip_id,\nCASE\n  WHEN departure_time < '06:00:00' THEN 'Early'\n  WHEN departure_time > '22:00:00' THEN 'Late'\n  ELSE 'Regular'\nEND AS time_band\nFROM stop_times\nLIMIT 120;`,
+    ],
+    [
+      "CASE · first stop vs other (stop_sequence = 1)",
+      ["stop_times"],
+      `SELECT trip_id,\nCAST(stop_sequence AS INTEGER) AS stop_sequence,\nCASE\n  WHEN CAST(stop_sequence AS INTEGER) = 1 THEN 'First Stop'\n  ELSE 'Other'\nEND AS stop_position\nFROM stop_times\nLIMIT 120;`,
+    ],
+    [
+      "CASE · long vs short route_long_name",
+      ["routes"],
+      `SELECT route_id,\nCASE\n  WHEN LENGTH(route_long_name) > 20 THEN 'Long Name'\n  ELSE 'Short Name'\nEND AS name_size\nFROM routes\nLIMIT 50;`,
+    ],
+    [
+      "CASE · calendar start_date older vs Current (YYYYMMDD text)",
+      ["calendar"],
+      `SELECT service_id,\nCASE\n  WHEN CAST(start_date AS TEXT) < '20240101' THEN 'Older'\n  ELSE 'Current'\nEND AS service_era\nFROM calendar\nLIMIT 45;`,
+    ],
+    [
+      "CASE · stop density Dense / Sparse (COUNT per trip)",
+      ["stop_times"],
+      `SELECT trip_id,\nCASE\n  WHEN COUNT(*) > 50 THEN 'Dense'\n  ELSE 'Sparse'\nEND AS density_label\nFROM stop_times\nGROUP BY trip_id\nLIMIT 60;`,
+    ],
+    [
+      "CASE · direction_id textual bucket (0-dir / 1-dir)",
+      ["trips"],
+      `SELECT trip_id,\nCASE\n  WHEN CAST(direction_id AS TEXT) = '0' THEN '0-dir'\n  ELSE '1-dir'\nEND AS dir_bucket\nFROM trips\nLIMIT 80;`,
+    ],
+    [
+      "CASE · route_id prefix grouping (e.g. '5%' as Streetcar hint)",
+      ["routes"],
+      `SELECT route_id,\nCASE\n  WHEN route_id LIKE '5%' THEN 'Streetcar'\n  ELSE 'Other'\nEND AS route_group_hint\nFROM routes\nLIMIT 50;`,
+    ],
+    [
+      "CASE · departure time bucket AM / Midday / PM",
+      ["stop_times"],
+      `SELECT departure_time,\nCASE\n  WHEN departure_time < '09:00:00' THEN 'AM'\n  WHEN departure_time < '15:00:00' THEN 'Midday'\n  ELSE 'PM'\nEND AS time_bucket\nFROM stop_times\nLIMIT 120;`,
+    ],
+    [
+      "CASE · flag missing departure_time",
+      ["stop_times"],
+      `SELECT trip_id,\nCASE\n  WHEN departure_time IS NULL OR TRIM(departure_time) = '' THEN 'Missing'\n  ELSE 'OK'\nEND AS dep_status\nFROM stop_times\nLIMIT 120;`,
+    ],
+    [
+      "CASE · trip_id label with direction + concat",
+      ["trips"],
+      `SELECT trip_id,\nCASE\n  WHEN CAST(direction_id AS TEXT) = '0' THEN 'Dir0-' || trip_id\n  ELSE 'Dir1-' || trip_id\nEND AS trip_direction_label\nFROM trips\nLIMIT 80;`,
+    ],
+  ].forEach(([title, tbls, sql]) => pushMid(title, tbls, sql));
+
   let docMediumAdded = 0;
   let docSkippedEasyDup = 0;
   let docSkippedMidDup = 0;

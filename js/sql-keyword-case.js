@@ -1,6 +1,10 @@
 /**
  * SQLite keyword uppercasing (matches CodeMirror 5 sqlite MIME keyword list loosely).
  * Skips line comments (--), block comments (slash-star), single-quoted strings, doubled-string and backtick identifiers.
+ *
+ * Intentionally does not upper-case `date` / `time` / `datetime` here: GTFS CSVs often use those as column names;
+ * SQLite treats bare identifiers case-insensitively anyway (`date` ≡ `DATE` for columns). Editor highlighting may
+ * still tint them — type `"date"` in double-quotes only if you need a distinctly-cased quoted identifier (rare).
  */
 (function (global) {
   var KW_SOURCE =
@@ -13,7 +17,7 @@
     /* aggregates & common funcs (match js/sqlite-codemirror-augment.js for editor styling) */
     "min max avg sum total group_concat row_number rank dense_rank ntile lag lead first_value last_value " +
     "abs coalesce hex ifnull iif instr length printf quote random round rtrim ltrim trim substr typeof unicode " +
-    "strftime date time datetime julianday cast ";
+    "strftime julianday cast ";
 
   var KW = null;
 

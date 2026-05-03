@@ -644,6 +644,239 @@ LIMIT 15;`,
       sql: `SELECT service_id, COUNT(*) AS trips FROM trips GROUP BY service_id ORDER BY trips DESC LIMIT 25;`,
     },
     {
+      title: "CASE · classify route_type (Bus / Streetcar / Other)",
+      tables: ["routes"],
+      sql: `SELECT route_id,
+CASE
+  WHEN CAST(route_type AS INTEGER) = 3 THEN 'Bus'
+  WHEN CAST(route_type AS INTEGER) = 0 THEN 'Streetcar'
+  ELSE 'Other'
+END AS service_type
+FROM routes
+LIMIT 50;`,
+    },
+    {
+      title: "CASE · Morning vs Evening (stop_times departure)",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN departure_time < '12:00:00' THEN 'Morning'
+  ELSE 'Evening'
+END AS period
+FROM stop_times
+LIMIT 120;`,
+    },
+    {
+      title: "CASE · Weekday vs Weekend (calendar weekday flags)",
+      tables: ["calendar"],
+      sql: `SELECT service_id,
+CASE
+  WHEN monday IN ('1', 'true') OR tuesday IN ('1', 'true') OR wednesday IN ('1', 'true')
+    OR thursday IN ('1', 'true') OR friday IN ('1', 'true')
+  THEN 'Weekday'
+  ELSE 'Weekend'
+END AS day_type
+FROM calendar
+LIMIT 45;`,
+    },
+    {
+      title: "CASE · AM peak / PM peak / Off-peak (departure_time)",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN departure_time BETWEEN '07:00:00' AND '09:00:00' THEN 'AM Peak'
+  WHEN departure_time BETWEEN '16:00:00' AND '18:00:00' THEN 'PM Peak'
+  ELSE 'Off-Peak'
+END AS period
+FROM stop_times
+LIMIT 120;`,
+    },
+    {
+      title: "CASE · group service_id MD1 / MD2 as Midday (trips)",
+      tables: ["trips"],
+      sql: `SELECT service_id,
+CASE
+  WHEN service_id IN ('MD1', 'MD2') THEN 'Midday'
+  ELSE CAST(service_id AS TEXT)
+END AS service_group
+FROM trips
+LIMIT 120;`,
+    },
+    {
+      title: "CASE · trip length Short / Medium / Long (stop_sequence buckets)",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN MAX(CAST(stop_sequence AS INTEGER)) < 20 THEN 'Short'
+  WHEN MAX(CAST(stop_sequence AS INTEGER)) < 50 THEN 'Medium'
+  ELSE 'Long'
+END AS trip_length
+FROM stop_times
+GROUP BY trip_id
+LIMIT 60;`,
+    },
+    {
+      title: "CASE · Express vs Local (numeric route_id hint ≥900)",
+      tables: ["routes"],
+      sql: `SELECT route_id,
+CASE
+  WHEN CAST(route_id AS INTEGER) >= 900 THEN 'Express'
+  ELSE 'Local Bus'
+END AS category
+FROM routes
+LIMIT 50;`,
+    },
+    {
+      title: "CASE · load level Low / Medium / High (stops per trip)",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN MAX(CAST(stop_sequence AS INTEGER)) > 60 THEN 'High'
+  WHEN MAX(CAST(stop_sequence AS INTEGER)) > 30 THEN 'Medium'
+  ELSE 'Low'
+END AS load_level
+FROM stop_times
+GROUP BY trip_id
+LIMIT 60;`,
+    },
+    {
+      title: "CASE · direction label Outbound / Inbound",
+      tables: ["trips"],
+      sql: `SELECT t.trip_id,
+CASE
+  WHEN CAST(t.direction_id AS INTEGER) = 0 THEN 'Outbound'
+  ELSE 'Inbound'
+END AS direction_label
+FROM trips AS t
+LIMIT 80;`,
+    },
+    {
+      title: "CASE · headway status Missing / Low frequency / Normal (frequencies)",
+      tables: ["frequencies"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN headway_secs IS NULL OR TRIM(CAST(headway_secs AS TEXT)) = '' THEN 'Missing'
+  WHEN CAST(headway_secs AS REAL) > 1800 THEN 'Low Frequency'
+  ELSE 'Normal'
+END AS headway_status
+FROM frequencies
+LIMIT 60;`,
+    },
+    {
+      title: "CASE · Early / Late / Regular (departure_time bands)",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN departure_time < '06:00:00' THEN 'Early'
+  WHEN departure_time > '22:00:00' THEN 'Late'
+  ELSE 'Regular'
+END AS time_band
+FROM stop_times
+LIMIT 120;`,
+    },
+    {
+      title: "CASE · first stop vs other (stop_sequence = 1)",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CAST(stop_sequence AS INTEGER) AS stop_sequence,
+CASE
+  WHEN CAST(stop_sequence AS INTEGER) = 1 THEN 'First Stop'
+  ELSE 'Other'
+END AS stop_position
+FROM stop_times
+LIMIT 120;`,
+    },
+    {
+      title: "CASE · long vs short route_long_name",
+      tables: ["routes"],
+      sql: `SELECT route_id,
+CASE
+  WHEN LENGTH(route_long_name) > 20 THEN 'Long Name'
+  ELSE 'Short Name'
+END AS name_size
+FROM routes
+LIMIT 50;`,
+    },
+    {
+      title: "CASE · calendar start_date older vs Current (YYYYMMDD text)",
+      tables: ["calendar"],
+      sql: `SELECT service_id,
+CASE
+  WHEN CAST(start_date AS TEXT) < '20240101' THEN 'Older'
+  ELSE 'Current'
+END AS service_era
+FROM calendar
+LIMIT 45;`,
+    },
+    {
+      title: "CASE · stop density Dense / Sparse (COUNT per trip)",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN COUNT(*) > 50 THEN 'Dense'
+  ELSE 'Sparse'
+END AS density_label
+FROM stop_times
+GROUP BY trip_id
+LIMIT 60;`,
+    },
+    {
+      title: "CASE · direction_id textual bucket (0-dir / 1-dir)",
+      tables: ["trips"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN CAST(direction_id AS TEXT) = '0' THEN '0-dir'
+  ELSE '1-dir'
+END AS dir_bucket
+FROM trips
+LIMIT 80;`,
+    },
+    {
+      title: "CASE · route_id prefix grouping (e.g. '5%' as Streetcar hint)",
+      tables: ["routes"],
+      sql: `SELECT route_id,
+CASE
+  WHEN route_id LIKE '5%' THEN 'Streetcar'
+  ELSE 'Other'
+END AS route_group_hint
+FROM routes
+LIMIT 50;`,
+    },
+    {
+      title: "CASE · departure time bucket AM / Midday / PM",
+      tables: ["stop_times"],
+      sql: `SELECT departure_time,
+CASE
+  WHEN departure_time < '09:00:00' THEN 'AM'
+  WHEN departure_time < '15:00:00' THEN 'Midday'
+  ELSE 'PM'
+END AS time_bucket
+FROM stop_times
+LIMIT 120;`,
+    },
+    {
+      title: "CASE · flag missing departure_time",
+      tables: ["stop_times"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN departure_time IS NULL OR TRIM(departure_time) = '' THEN 'Missing'
+  ELSE 'OK'
+END AS dep_status
+FROM stop_times
+LIMIT 120;`,
+    },
+    {
+      title: "CASE · trip_id label with direction + concat",
+      tables: ["trips"],
+      sql: `SELECT trip_id,
+CASE
+  WHEN CAST(direction_id AS TEXT) = '0' THEN 'Dir0-' || trip_id
+  ELSE 'Dir1-' || trip_id
+END AS trip_direction_label
+FROM trips
+LIMIT 80;`,
+    },
+    {
       title: "Count trips per route ordered descending",
       tables: ["trips"],
       sql: `SELECT route_id, COUNT(*) AS trips FROM trips GROUP BY route_id ORDER BY trips DESC;`,
