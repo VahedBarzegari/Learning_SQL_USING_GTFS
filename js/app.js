@@ -14,6 +14,12 @@
   /** Imported table names keyed for starter validation */
   var tableSet = null;
 
+  /** Last-selected table key in right-hand schema explorer */
+  var schemaExplorerTable = null;
+
+  var SCHEMA_DETAIL_IDLE =
+    '<p class="schema-detail-empty muted">Imported tables appear here once the database is ready.</p>';
+
   var zipTxtEntries = [];
 
   var sqlCm = null;
@@ -53,7 +59,10 @@
     els.status = document.getElementById("status");
     els.buildBusy = document.getElementById("buildBusy");
     els.buildBusyMsg = document.getElementById("buildBusyMsg");
-    els.tablesList = document.getElementById("tablesList");
+    els.schemaNav = document.getElementById("schemaNav");
+    els.schemaHint = document.getElementById("schemaHint");
+    els.schemaTableList = document.getElementById("schemaTableList");
+    els.schemaDetail = document.getElementById("schemaDetail");
     els.sqlEditor = document.getElementById("sqlEditor");
     els.btnRun = document.getElementById("btnRun");
     els.btnClear = document.getElementById("btnClear");
@@ -104,6 +113,8 @@
       els.results.innerHTML = '<div class="result-meta">Cleared.</div>';
       els.errorBox.classList.add("hidden");
     });
+
+    refreshSchemaExplorer();
   });
 
   function hideError() {
@@ -118,6 +129,92 @@
 
   function status(msg) {
     els.status.textContent = msg || "";
+  }
+
+  /** @returns {string} */
+  function escapeSqlIdentDoubleQuoted(s) {
+    return '"' + String(s).replace(/"/g, '""') + '"';
+  }
+
+  function refreshSchemaExplorer() {
+    if (!els.schemaNav || !els.schemaTableList || !els.schemaDetail) return;
+
+    var prevSel = schemaExplorerTable;
+    schemaExplorerTable = null;
+    els.schemaDetail.innerHTML = SCHEMA_DETAIL_IDLE;
+    els.schemaTableList.innerHTML = "";
+
+    var hasTables = Boolean(tableSet && currentDb && Object.keys(tableSet).length);
+    if (els.schemaHint) els.schemaHint.classList.toggle("hidden", hasTables);
+    els.schemaNav.classList.toggle("hidden", !hasTables);
+
+    if (!hasTables) return;
+
+    /** @type {string[]} */
+    var names = Object.keys(tableSet);
+    names.sort(function (a, b) {
+      return a.localeCompare(b);
+    });
+
+    names.forEach(function (t) {
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "schema-table-btn";
+      btn.textContent = t;
+      btn.setAttribute("data-table-name", t);
+      btn.addEventListener("click", function () {
+        selectSchemaExplorerTable(t);
+      });
+      li.appendChild(btn);
+      els.schemaTableList.appendChild(li);
+    });
+
+    if (prevSel && names.indexOf(prevSel) >= 0) selectSchemaExplorerTable(prevSel);
+    else if (names.length) selectSchemaExplorerTable(names[0]);
+  }
+
+  /**
+   * @param {string} tableName imported table identifier (whitelist via tableSet)
+   */
+  function selectSchemaExplorerTable(tableName) {
+    if (!els.schemaDetail || !currentDb || !tableSet || !tableSet[tableName]) return;
+
+    schemaExplorerTable = tableName;
+
+    Array.prototype.slice.call(els.schemaTableList.querySelectorAll(".schema-table-btn")).forEach(function (b) {
+      b.classList.toggle("schema-table-btn-active", b.getAttribute("data-table-name") === tableName);
+    });
+
+    els.schemaDetail.innerHTML = "";
+
+    var escIdent = escapeSqlIdentDoubleQuoted(tableName);
+
+    try {
+      var previewSqlTrim = "SELECT * FROM " + escIdent + " LIMIT 25";
+      var dq = currentDb.exec(previewSqlTrim);
+      var wrapRows = document.createElement("div");
+      wrapRows.className = "schema-detail-section";
+      var hPrev = document.createElement("div");
+      hPrev.className = "schema-detail-heading";
+      hPrev.textContent = "Data preview — up to 25 rows";
+      wrapRows.appendChild(hPrev);
+      if (dq.length && dq[0].columns && dq[0].values && dq[0].values.length) {
+        wrapRows.appendChild(renderHtmlTable(dq[0].columns, dq[0].values, 25));
+      } else {
+        var p0 = document.createElement("p");
+        p0.className = "result-meta muted";
+        p0.textContent = "Zero rows returned for LIMIT preview.";
+        wrapRows.appendChild(p0);
+      }
+      els.schemaDetail.appendChild(wrapRows);
+    } catch (ex) {
+      var err = document.createElement("div");
+      err.className = "schema-detail-section";
+      err.textContent = ex && ex.message ? ex.message : String(ex);
+      err.style.color = "var(--danger)";
+      els.schemaDetail.appendChild(err);
+    }
   }
 
   /** Centered overlay + spinner while SQLite import runs (blocking UI). */
@@ -427,7 +524,9 @@
 
     els.btnRun.disabled = true;
     els.btnClear.disabled = true;
-    els.tablesList.innerHTML = "";
+    schemaExplorerTable = null;
+    refreshSchemaExplorer();
+
     status("Parsing ZIP manifest…");
 
     zipBlob = f;
@@ -560,15 +659,9 @@
       });
       tableSet = map;
 
-      els.tablesList.innerHTML = "";
-      result.importedTables.forEach(function (t) {
-        var li = document.createElement("li");
-        li.textContent = t;
-        els.tablesList.appendChild(li);
-      });
-
       els.btnRun.disabled = false;
       refreshStarterAvailability();
+      refreshSchemaExplorer();
 
       var warnText =
         "Imported " +

@@ -36,10 +36,6 @@
             </button>
           </details>
           <p id="status" class="status" role="status"></p>
-          <details class="collapsible">
-            <summary>Imported tables</summary>
-            <ul id="tablesList" class="tables-list muted"></ul>
-          </details>
         </section>
 
         <section class="panel">
@@ -65,6 +61,17 @@
           <div id="results" class="results muted">No query yet.</div>
         </section>
       </main>
+
+      <aside class="tables-side" aria-label="Imported tables explorer">
+        <h2 class="sidebar-section-title">Tables</h2>
+        <p id="schemaHint" class="schema-hint muted small">
+          After you build SQLite, choose a table to inspect columns (PRAGMA) and preview rows.
+        </p>
+        <div id="schemaNav" class="schema-nav hidden">
+          <ul id="schemaTableList" class="schema-table-list" role="list"></ul>
+        </div>
+        <div id="schemaDetail" class="schema-detail" aria-live="polite"></div>
+      </aside>
     </div>
 
     <div id="buildBusy" class="build-busy-overlay hidden" aria-busy="false" aria-live="polite" aria-hidden="true">
