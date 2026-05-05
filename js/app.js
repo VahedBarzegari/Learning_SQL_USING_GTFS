@@ -75,6 +75,7 @@
         mode: "text/x-sqlite",
         indentWithTabs: false,
         indentUnit: 2,
+        smartIndent: false,
         lineNumbers: true,
         lineWrapping: true,
         tabSize: 2,
